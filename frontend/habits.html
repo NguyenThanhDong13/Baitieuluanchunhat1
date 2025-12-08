@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Habits</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Danh sách thói quen</h2>
+
+    <ul id="habit-list"></ul>
+
+    <h3>Thêm thói quen</h3>
+    <input id="new-habit-name" placeholder="Tên thói quen">
+    <button onclick="createHabit()">Thêm</button>
+
+    <a href="dashboard.html">Quay lại Dashboard</a>
+</div>
+
+<script src="app.js"></script>
+<script>loadHabits();</script>
+</body>
+</html>
