@@ -1,55 +1,41 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
-from app.db import get_db
-from app.models.habit import Habit
+from fastapi.security import OAuth2PasswordBearer
+from datetime import datetime
+from app.db import SessionLocal
 from app.models.habit_log import HabitLog
 from app.schemas.habit_log import HabitLogCreate, HabitLogOut
-from app.routers.auth import get_current_user
+from app.core.security import SECRET_KEY, ALGORITHM
 from app.models.user import User
+from jose import jwt
 
 router = APIRouter()
+oauth2 = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-def _get_habit_owned(db: Session, habit_id: int, user_id: int) -> Habit | None:
-    return (
-        db.query(Habit)
-        .filter(Habit.id == habit_id, Habit.owner_id == user_id)
-        .first()
-    )
-
+def current_user(token: str = Depends(oauth2), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload.get("sub"))
+        return db.query(User).filter(User.id == user_id).first()
+    except:
+        raise HTTPException(status_code=401, detail="Token lỗi hoặc hết hạn")
 
 @router.get("/", response_model=list[HabitLogOut])
-def list_logs(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    logs = (
-        db.query(HabitLog)
-        .join(Habit, Habit.id == HabitLog.habit_id)
-        .filter(Habit.owner_id == current_user.id)
-        .all()
-    )
-    return logs
-
+def get_logs(db: Session = Depends(get_db), user=Depends(current_user)):
+    return db.query(HabitLog).all()
 
 @router.post("/", response_model=HabitLogOut)
-def create_log(
-    log_in: HabitLogCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    habit = _get_habit_owned(db, log_in.habit_id, current_user.id)
-    if not habit:
-        raise HTTPException(status_code=404, detail="Habit not found")
-
-    log = HabitLog(
-        habit_id=log_in.habit_id,
-        log_date=log_in.log_date,
-        status=log_in.status,
-        note=log_in.note,
-    )
-    db.add(log)
+def create_log(log: HabitLogCreate, db: Session = Depends(get_db), user=Depends(current_user)):
+    dt = datetime.fromisoformat(log.date)
+    new_log = HabitLog(habit_id=log.habit_id, date=dt)
+    db.add(new_log)
     db.commit()
-    db.refresh(log)
-    return log
+    db.refresh(new_log)
+    return new_log

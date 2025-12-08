@@ -1,27 +1,13 @@
-from datetime import datetime
-
 from pydantic import BaseModel
-from pydantic import ConfigDict
 
-
-class HabitBase(BaseModel):
-    title: str
+class HabitCreate(BaseModel):
+    name: str
     description: str | None = None
-    is_active: bool = True
 
-
-class HabitCreate(HabitBase):
-    pass
-
-
-class HabitUpdate(BaseModel):
-    title: str | None = None
-    description: str | None = None
-    is_active: bool | None = None
-
-
-class HabitOut(HabitBase):
+class HabitOut(BaseModel):
     id: int
-    created_at: datetime
+    name: str
+    description: str | None
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        from_attributes = True

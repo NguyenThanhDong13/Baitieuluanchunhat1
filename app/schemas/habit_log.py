@@ -1,22 +1,14 @@
-from datetime import date, datetime
-
 from pydantic import BaseModel
-from pydantic import ConfigDict
+from datetime import datetime
 
-
-class HabitLogBase(BaseModel):
-    log_date: date | None = None
-    status: str = "done"
-    note: str | None = None
-
-
-class HabitLogCreate(HabitLogBase):
+class HabitLogCreate(BaseModel):
     habit_id: int
+    date: str  # YYYY-MM-DD
 
-
-class HabitLogOut(HabitLogBase):
+class HabitLogOut(BaseModel):
     id: int
     habit_id: int
-    created_at: datetime
+    date: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        from_attributes = True
