@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Habit Tracker – Thói quen</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body data-page="habits">
+
+<header class="topbar">
+    <div class="logo">Habit Tracker</div>
+
+    <nav class="nav">
+        <a href="/dashboard" class="nav-item">Dashboard</a>
+        <a href="/habits" class="nav-item active">Thói quen</a>
+        <button id="logout-btn" class="btn small">Đăng xuất</button>
+    </nav>
+</header>
+
+<main class="page">
+
+    <section class="two-column">
+
+        <div class="card">
+            <h2>Thêm thói quen mới</h2>
+            <form id="habit-form">
+                <label>Tên thói quen</label>
+                <input name="name" required />
+
+                <label>Mô tả (tuỳ chọn)</label>
+                <textarea name="description"></textarea>
+
+                <button type="submit" class="btn primary">Tạo thói quen</button>
+                <p id="habit-message" class="message"></p>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Danh sách thói quen</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tên</th>
+                        <th>Mô tả</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="habit-list"></tbody>
+            </table>
+        </div>
+
+    </section>
+
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Habit Tracker – Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body data-page="dashboard">
+
+<header class="topbar">
+    <div class="logo">Habit Tracker</div>
+
+    <nav class="nav">
+        <a href="/dashboard" class="nav-item active">Dashboard</a>
+        <a href="/habits" class="nav-item">Thói quen</a>
+        <button id="logout-btn" class="btn small">Đăng xuất</button>
+    </nav>
+</header>
+
+<main class="page">
+    <section class="stats-grid">
+        <div class="stat-card">
+            <h3>Tổng số thói quen</h3>
+            <p id="stat-total-habits" class="stat-value">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Hoàn thành hôm nay</h3>
+            <p id="stat-today-completed" class="stat-value">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Streak hiện tại</h3>
+            <p id="stat-current-streak" class="stat-value">0 ngày</p>
+        </div>
+    </section>
+
+    <section class="two-column">
+        <div class="card">
+            <h2>Heatmap 30 ngày gần nhất</h2>
+            <div id="heatmap" class="heatmap"></div>
+        </div>
+
+        <div class="card">
+            <h2>Hoạt động gần đây</h2>
+            <ul id="recent-logs" class="activity-list"></ul>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Tiến độ tháng</h2>
+        <div class="progress-bar">
+            <div id="progress-bar" class="progress"></div>
+        </div>
+        <p id="progress-text" class="progress-text"></p>
+        <p id="progress-days" class="progress-days"></p>
+    </section>
+
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

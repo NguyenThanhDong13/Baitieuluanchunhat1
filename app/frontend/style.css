@@ -1,0 +1,183 @@
+/* ==== GLOBAL ==== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef2ff;
+}
+
+/* ==== AUTH ==== */
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.auth-box {
+    background: white;
+    width: 400px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.title {
+    text-align: center;
+    font-size: 26px;
+}
+
+.subtitle {
+    text-align: center;
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #e0e0e0;
+}
+
+.tab-button.active {
+    background: #5a54ff;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.btn {
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn.full { width: 100%; }
+.btn.primary {
+    background: #5a54ff;
+    color: white;
+}
+.btn.secondary {
+    background: #ddd;
+}
+
+/* ==== DASHBOARD / HABITS ==== */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    background: #5a54ff;
+    padding: 15px 20px;
+    color: white;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-item {
+    color: white;
+    text-decoration: none;
+    padding: 6px 10px;
+}
+.nav-item.active {
+    background: rgba(255,255,255,0.3);
+    border-radius: 6px;
+}
+
+.page {
+    padding: 25px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.stats-grid {
+    display: flex;
+    gap: 20px;
+}
+.stat-card {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.two-column {
+    display: flex;
+    gap: 20px;
+}
+
+.heatmap {
+    display: grid;
+    grid-template-columns: repeat(30, 1fr);
+    gap: 4px;
+}
+.heat-cell {
+    width: 18px;
+    height: 18px;
+    background: #dfe3ff;
+    border-radius: 3px;
+}
+
+.heat-cell.level-1 { background: #b7c3ff; }
+.heat-cell.level-2 { background: #8ea3ff; }
+.heat-cell.level-3 { background: #637fff; }
+.heat-cell.level-4 { background: #3b5cff; }
+
+.progress-bar {
+    background: #ddd;
+    height: 18px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: #5a54ff;
+    width: 0%;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table th, .table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Messages */
+.message {
+    margin-top: 12px;
+    font-size: 14px;
+}
+.message.error { color: red; }
+.message.success { color: green; }
