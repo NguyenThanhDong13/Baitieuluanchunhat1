@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Habit Tracker – Nhật ký</title>
+    <link rel="stylesheet" href="/static/style.css" />
+
+    <style>
+        body {
+            background: #eef3ff;
+            font-family: Arial;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: #3b4cd9;
+            padding: 14px 25px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar .nav-item {
+            color: white;
+            margin-left: 16px;
+            font-weight: bold;
+        }
+
+        .topbar .nav-item.active {
+            background: #6574ff;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        /* ===== PAGE LAYOUT ===== */
+        .logs-layout {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        /* ===== LEFT: DAY + HABITS ===== */
+        .logs-left {
+            width: 65%;
+        }
+
+        .day-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #3b4cd9;
+        }
+
+        .day-subtitle {
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .habit-card {
+            background: white;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .habit-card-done {
+            border-left: 5px solid #36c56a;
+        }
+
+        .habit-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #d9fce6;
+            color: #36c56a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        /* ===== RIGHT: CALENDAR ===== */
+        .logs-right {
+            width: 30%;
+        }
+
+        .calendar-card {
+            background: white;
+            padding: 15px;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #3b4cd9;
+            margin-bottom: 10px;
+        }
+
+        .cal-nav-btn {
+            background: #d8dffe;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            row-gap: 8px;
+            text-align: center;
+        }
+
+        .cal-weekday {
+            font-weight: bold;
+            color: #3b4cd9;
+        }
+
+        .cal-day {
+            padding: 8px 0;
+            background: #f6f7ff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .cal-day.today {
+            border: 2px solid #36c56a;
+        }
+
+        .cal-day.selected {
+            background: #cdd6ff;
+            font-weight: bold;
+        }
+
+        .cal-day.has-log {
+            background: #b7ffd4 !important;
+        }
+
+        .empty {
+            background: transparent !important;
+            cursor: default;
+        }
+    </style>
+</head>
+
+<body data-page="logs">
+
+<!-- NAVBAR GIỮ NGUYÊN -->
+<header class="topbar">
+    <div class="logo">Habit Tracker</div>
+
+    <nav class="nav">
+        <a href="/logs" class="nav-item active">Nhật ký</a>
+        <a href="/dashboard" class="nav-item">Thống kê</a>
+        <button id="logout-btn" class="btn small logout">Đăng xuất</button>
+    </nav>
+</header>
+
+<!-- ===== PAGE MAIN ===== -->
+<main class="logs-layout">
+
+    <!-- LEFT PANEL -->
+    <section class="logs-left">
+        <div id="selected-weekday" class="day-title">Hôm nay</div>
+        <div id="selected-date-text" class="day-subtitle"></div>
+
+        <div id="selected-habits"></div>
+    </section>
+
+    <!-- RIGHT PANEL (CALENDAR) -->
+    <aside class="logs-right">
+        <div class="calendar-card">
+            <div class="calendar-header">
+                <button id="cal-prev" class="cal-nav-btn">&#8249;</button>
+                <span id="calendar-month-year"></span>
+                <button id="cal-next" class="cal-nav-btn">&#8250;</button>
+            </div>
+
+            <div id="calendar-days" class="calendar-grid"></div>
+        </div>
+    </aside>
+
+</main>
+
+<script src="/static/app.js"></script>
+
+</body>
+</html>

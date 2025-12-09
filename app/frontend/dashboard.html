@@ -2,31 +2,37 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
-    <title>Habit Tracker – Dashboard</title>
+    <title>Habit Tracker – Thống kê</title>
     <link rel="stylesheet" href="/static/style.css" />
 </head>
+
 <body data-page="dashboard">
 
+<!-- ================= NAVBAR ================== -->
 <header class="topbar">
     <div class="logo">Habit Tracker</div>
 
     <nav class="nav">
-        <a href="/dashboard" class="nav-item active">Dashboard</a>
-        <a href="/habits" class="nav-item">Thói quen</a>
-        <button id="logout-btn" class="btn small">Đăng xuất</button>
+        <a href="/logs" class="nav-item">Nhật ký</a>
+        <a href="/dashboard" class="nav-item active">Thống kê</a>
+        <button id="logout-btn" class="btn small logout">Đăng xuất</button>
     </nav>
 </header>
+<!-- =========================================== -->
 
 <main class="page">
+
     <section class="stats-grid">
         <div class="stat-card">
             <h3>Tổng số thói quen</h3>
             <p id="stat-total-habits" class="stat-value">0</p>
         </div>
+
         <div class="stat-card">
             <h3>Hoàn thành hôm nay</h3>
             <p id="stat-today-completed" class="stat-value">0</p>
         </div>
+
         <div class="stat-card">
             <h3>Streak hiện tại</h3>
             <p id="stat-current-streak" class="stat-value">0 ngày</p>
@@ -34,11 +40,13 @@
     </section>
 
     <section class="two-column">
+        <!-- Heatmap -->
         <div class="card">
             <h2>Heatmap 30 ngày gần nhất</h2>
             <div id="heatmap" class="heatmap"></div>
         </div>
 
+        <!-- Recent logs -->
         <div class="card">
             <h2>Hoạt động gần đây</h2>
             <ul id="recent-logs" class="activity-list"></ul>
