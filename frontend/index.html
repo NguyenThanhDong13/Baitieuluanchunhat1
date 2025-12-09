@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Habit Tracker – Đăng nhập</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="auth">
+<div class="auth-layout">
+    <div class="auth-card">
+        <h1 class="app-title">Habit Tracker</h1>
+        <p class="app-subtitle">Theo dõi thói quen mỗi ngày, giữ streak không đứt quãng.</p>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="login">Đăng nhập</button>
+            <button class="tab-button" data-tab="register">Đăng ký</button>
+        </div>
+
+        <!-- Login -->
+        <form id="login-form" class="tab-content active">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required />
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" name="password" required />
+            </div>
+            <button type="submit" class="btn primary full">Đăng nhập</button>
+        </form>
+
+        <!-- Register -->
+        <form id="register-form" class="tab-content">
+            <div class="form-group">
+                <label>Họ tên</label>
+                <input type="text" name="full_name" required />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required />
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" name="password" required />
+            </div>
+            <button type="submit" class="btn secondary full">Đăng ký</button>
+        </form>
+
+        <p id="auth-message" class="message"></p>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
