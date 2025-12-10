@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8" />
     <title>Habit Tracker – Nhật ký</title>
@@ -8,7 +9,7 @@
     <style>
         body {
             background: #eef3ff;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
         }
 
         /* ===== TOPBAR ===== */
@@ -25,12 +26,22 @@
             color: white;
             margin-left: 16px;
             font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
         }
 
         .topbar .nav-item.active {
             background: #6574ff;
             padding: 6px 12px;
             border-radius: 6px;
+        }
+
+        #btn-open-create {
+            background: #4ade80;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: #064e3b !important;
+            font-weight: bold;
         }
 
         /* ===== PAGE LAYOUT ===== */
@@ -40,7 +51,6 @@
             padding: 20px;
         }
 
-        /* ===== LEFT: DAY + HABITS ===== */
         .logs-left {
             width: 65%;
         }
@@ -56,34 +66,99 @@
             margin-bottom: 20px;
         }
 
+        /* ===== HABIT CARD ===== */
         .habit-card {
-            background: white;
-            padding: 14px;
-            border-radius: 12px;
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 16px;
             margin-bottom: 14px;
             display: flex;
             align-items: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            justify-content: space-between;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
         }
 
         .habit-card-done {
-            border-left: 5px solid #36c56a;
+            border-left: 5px solid #22c55e;
+        }
+
+        .habit-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .habit-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #d9fce6;
-            color: #36c56a;
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: #dcfce7;
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin-right: 12px;
-            font-size: 20px;
+            justify-content: center;
+            font-size: 22px;
         }
 
-        /* ===== RIGHT: CALENDAR ===== */
+        .habit-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .habit-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .habit-status {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Tick */
+        .habit-toggle {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .toggle-circle {
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            border: 2px solid #d4d4d4;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.18s ease;
+        }
+
+        .toggle-check {
+            font-size: 16px;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.18s ease;
+            color: white;
+        }
+
+        .habit-toggle.done .toggle-circle {
+            background: #22c55e;
+            border-color: #16a34a;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+        }
+
+        .habit-toggle.done .toggle-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ===== CALENDAR ===== */
         .logs-right {
             width: 30%;
         }
@@ -92,7 +167,7 @@
             background: white;
             padding: 15px;
             border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .calendar-header {
@@ -150,49 +225,228 @@
             background: transparent !important;
             cursor: default;
         }
+
+        /* ========= POPUP ========= */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .popup-content {
+            background: white;
+            width: 360px;
+            padding: 20px 22px;
+            border-radius: 18px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .popup-title {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 22px;
+        }
+
+        .popup-row {
+            margin-bottom: 12px;
+        }
+
+        .popup-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .popup-content input,
+        .popup-content select,
+        .popup-content textarea {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .btn-time {
+            width: 100%;
+            padding: 10px;
+            background: #e9f2ff;
+            color: #3b82f6;
+            border-radius: 10px;
+            border: 1px solid #c5ddff;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
+
+        .time-display {
+            font-size: 13px;
+            color: #6b7280;
+            min-height: 18px;
+        }
+
+        .popup-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .btn.primary {
+            background: #2563eb;
+            color: white;
+            padding: 9px 18px;
+            border-radius: 999px;
+        }
+
+        .btn.secondary {
+            background: #e5e7eb;
+            padding: 9px 18px;
+            border-radius: 999px;
+        }
+
+        /* ICON CHOICES */
+        .icon-choices {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 4px 0 12px;
+        }
+
+        .icon-pill {
+            border: none;
+            background: #f3f4ff;
+            padding: 5px 9px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .icon-pill span {
+            font-size: 18px;
+        }
+
+        .icon-pill.selected {
+            background: #2563eb;
+            color: #fff;
+        }
     </style>
 </head>
 
 <body data-page="logs">
 
-<!-- NAVBAR GIỮ NGUYÊN -->
-<header class="topbar">
-    <div class="logo">Habit Tracker</div>
+    <!-- NAVBAR -->
+    <header class="topbar">
+        <div class="logo">Habit Tracker</div>
 
-    <nav class="nav">
-        <a href="/logs" class="nav-item active">Nhật ký</a>
-        <a href="/dashboard" class="nav-item">Thống kê</a>
-        <button id="logout-btn" class="btn small logout">Đăng xuất</button>
-    </nav>
-</header>
+        <nav class="nav">
+            <a href="/logs" class="nav-item active">Nhật ký</a>
+            <span id="btn-open-create" class="nav-item">+ Tạo thói quen</span>
+            <a href="/dashboard" class="nav-item">Thống kê</a>
+            <button id="logout-btn" class="btn small logout">Đăng xuất</button>
+        </nav>
+    </header>
 
-<!-- ===== PAGE MAIN ===== -->
-<main class="logs-layout">
+    <!-- ===== PAGE MAIN ===== -->
+    <main class="logs-layout">
 
-    <!-- LEFT PANEL -->
-    <section class="logs-left">
-        <div id="selected-weekday" class="day-title">Hôm nay</div>
-        <div id="selected-date-text" class="day-subtitle"></div>
+        <!-- LEFT PANEL -->
+        <section class="logs-left">
+            <div id="selected-weekday" class="day-title">Hôm nay</div>
+            <div id="selected-date-text" class="day-subtitle"></div>
 
-        <div id="selected-habits"></div>
-    </section>
+            <div id="selected-habits"></div>
+        </section>
 
-    <!-- RIGHT PANEL (CALENDAR) -->
-    <aside class="logs-right">
-        <div class="calendar-card">
-            <div class="calendar-header">
-                <button id="cal-prev" class="cal-nav-btn">&#8249;</button>
-                <span id="calendar-month-year"></span>
-                <button id="cal-next" class="cal-nav-btn">&#8250;</button>
+        <!-- RIGHT CALENDAR -->
+        <aside class="logs-right">
+            <div class="calendar-card">
+                <div class="calendar-header">
+                    <button id="cal-prev" class="cal-nav-btn">&#8249;</button>
+                    <span id="calendar-month-year"></span>
+                    <button id="cal-next" class="cal-nav-btn">&#8250;</button>
+                </div>
+
+                <div id="calendar-days" class="calendar-grid"></div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- ===== POPUP TẠO THÓI QUEN ===== -->
+    <div id="create-popup" class="popup hidden">
+        <div class="popup-content">
+
+            <h2 class="popup-title">Tạo Thói Quen</h2>
+
+            <label>Tên</label>
+            <input id="habit-name" type="text" placeholder="Ví dụ: Tập thể dục">
+
+            <label>Câu hỏi</label>
+            <input id="habit-question" type="text" placeholder="Hôm nay bạn đã làm chưa?">
+
+            <label>Biểu tượng</label>
+            <div id="icon-choices" class="icon-choices">
+                <button type="button" class="icon-pill" data-icon="💪"><span>💪</span>Thể dục</button>
+                <button type="button" class="icon-pill" data-icon="📚"><span>📚</span>Học tập</button>
+                <button type="button" class="icon-pill" data-icon="🧹"><span>🧹</span>Việc nhà</button>
+                <button type="button" class="icon-pill" data-icon="😴"><span>😴</span>Ngủ nghỉ</button>
+                <button type="button" class="icon-pill" data-icon="🍎"><span>🍎</span>Ăn uống</button>
+                <button type="button" class="icon-pill" data-icon="🧘"><span>🧘</span>Thiền</button>
+            </div>
+            <input type="hidden" id="habit-icon" value="">
+
+            <label>Tần suất</label>
+            <select id="habit-frequency">
+                <option value="daily">Hàng ngày</option>
+                <option value="weekly">Hàng tuần</option>
+            </select>
+
+            <label>Nhắc nhở (giờ)</label>
+            <button id="open-timepicker" class="btn-time">Chọn giờ</button>
+            <div id="selected-time" class="time-display"></div>
+
+            <label>Ghi chú</label>
+            <textarea id="habit-note" rows="3" placeholder="(Không bắt buộc)"></textarea>
+
+            <div class="popup-actions">
+                <button id="popup-close" class="btn secondary">Đóng</button>
+                <button id="popup-save" class="btn primary">Lưu</button>
             </div>
 
-            <div id="calendar-days" class="calendar-grid"></div>
         </div>
-    </aside>
+    </div>
 
-</main>
+    <!-- ===== TIME PICKER ===== -->
+    <div id="timepicker" class="popup hidden">
+        <div class="popup-content timepicker-box">
+            <h3>Chọn giờ</h3>
 
-<script src="/static/app.js"></script>
+            <input type="time" id="time-input" value="08:00">
+
+            <div class="popup-actions">
+                <button id="time-cancel" class="btn secondary">Hủy</button>
+                <button id="time-ok" class="btn primary">Xong</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
 
 </body>
+
 </html>

@@ -1,11 +1,15 @@
-// ======================= CONFIG ==========================
+/*********************************************************
+ *                     CONFIG
+ *********************************************************/
 const API_BASE = "";
 
 function apiUrl(path) {
     return path.startsWith("/") ? path : "/" + path;
 }
 
-// ======================= TOKEN ==========================
+/*********************************************************
+ *                     TOKEN
+ *********************************************************/
 function saveToken(token) {
     localStorage.setItem("access_token", token);
 }
@@ -16,42 +20,44 @@ function clearToken() {
     localStorage.removeItem("access_token");
 }
 
-// ======================= API WRAPPER ====================
+/*********************************************************
+ *                     API WRAPPER
+ *********************************************************/
 async function apiFetch(path, options = {}) {
     const token = getToken();
     const headers = options.headers || {};
     headers["Content-Type"] = "application/json";
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const res = await fetch(apiUrl(path), { ...options, headers });
     const contentType = res.headers.get("content-type") || "";
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(text);
+        throw new Error(text || res.statusText);
     }
 
-    if (contentType.includes("application/json")) {
-        return res.json();
-    }
+    if (contentType.includes("application/json")) return res.json();
 
     return null;
 }
 
-// ======================= PAGE ROUTING ====================
+/*********************************************************
+ *                     ROUTING
+ *********************************************************/
 document.addEventListener("DOMContentLoaded", () => {
     const page = document.body.dataset.page;
 
-    if (page === "auth")      initAuthPage();
+    if (page === "auth") initAuthPage();
     if (page === "dashboard") initDashboardPage();
-    if (page === "habits")    initHabitsPage();
-    if (page === "logs")      initLogsPage();
+    if (page === "habits") initHabitsPage();
+    if (page === "logs") initLogsPage();
 });
 
-// ======================= COMMON ==========================
+/*********************************************************
+ *                     COMMON
+ *********************************************************/
 function guardAuth() {
     if (!getToken()) window.location.href = "/";
 }
@@ -66,7 +72,9 @@ function bindLogout() {
     }
 }
 
-// ======================= AUTH PAGE =======================
+/*********************************************************
+ *                     AUTH PAGE
+ *********************************************************/
 function initAuthPage() {
     const tabs = document.querySelectorAll(".tab-button");
     const contents = document.querySelectorAll(".tab-content");
@@ -80,13 +88,11 @@ function initAuthPage() {
             contents.forEach((c) => c.classList.remove("active"));
 
             btn.classList.add("active");
-            document
-                .getElementById(btn.dataset.tab + "-form")
-                .classList.add("active");
+            document.getElementById(btn.dataset.tab + "-form").classList.add("active");
         });
     });
 
-    // LOGIN
+    /** LOGIN */
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         msg.textContent = "";
@@ -104,10 +110,10 @@ function initAuthPage() {
             });
 
             saveToken(data.access_token);
+
             msg.textContent = "Đăng nhập thành công!";
             msg.classList.add("success");
 
-            // ĐĂNG NHẬP XONG → VÀO NHẬT KÝ
             setTimeout(() => (window.location.href = "/logs"), 500);
         } catch (err) {
             msg.textContent = "Đăng nhập thất bại: " + err.message;
@@ -115,9 +121,10 @@ function initAuthPage() {
         }
     });
 
-    // REGISTER
+    /** REGISTER */
     registerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+
         msg.textContent = "";
         msg.className = "message";
 
@@ -142,52 +149,9 @@ function initAuthPage() {
     });
 }
 
-// ======================= DASHBOARD PAGE ===================
-async function initDashboardPage() {
-    guardAuth();
-    bindLogout();
-
-    try {
-        const habits = await apiFetch("/habits/");
-        const logs = await apiFetch("/logs/");
-
-        renderDashboardStats(habits, logs);
-        renderHeatmap(logs);
-        renderRecentLogs(logs, habits);
-        await loadProgress();
-    } catch (err) {
-        alert("Lỗi tải dữ liệu dashboard: " + err.message);
-    }
-}
-
-function renderDashboardStats(habits, logs) {
-    const totalEl = document.getElementById("stat-total-habits");
-    const todayDoneEl = document.getElementById("stat-today-completed");
-    const streakEl = document.getElementById("stat-current-streak");
-
-    if (!totalEl || !todayDoneEl || !streakEl) return;
-
-    totalEl.textContent = habits.length;
-
-    const today = new Date().toISOString().slice(0, 10);
-    const todayLogs = logs.filter((l) => l.date?.slice(0, 10) === today);
-    todayDoneEl.textContent = todayLogs.length;
-
-    const logDates = new Set(logs.map((l) => l.date?.slice(0, 10)));
-    let streak = 0;
-    let cursor = new Date();
-
-    while (true) {
-        const d = cursor.toISOString().slice(0, 10);
-        if (logDates.has(d)) {
-            streak++;
-            cursor.setDate(cursor.getDate() - 1);
-        } else break;
-    }
-
-    streakEl.textContent = streak + " ngày";
-}
-
+/*********************************************************
+ *                     HEATMAP (GLOBAL FIX)
+ *********************************************************/
 function renderHeatmap(logs) {
     const container = document.getElementById("heatmap");
     if (!container) return;
@@ -206,6 +170,7 @@ function renderHeatmap(logs) {
     for (let i = 29; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
+
         const key = d.toISOString().slice(0, 10);
         const count = countByDate[key] || 0;
 
@@ -215,10 +180,59 @@ function renderHeatmap(logs) {
         if (count >= 3) lvl = 3;
         if (count >= 4) lvl = 4;
 
-        const cell = document.createElement("div");
-        cell.className = "heat-cell level-" + lvl;
-        container.appendChild(cell);
+        const el = document.createElement("div");
+        el.className = "heat-cell level-" + lvl;
+
+        container.appendChild(el);
     }
+}
+
+/*********************************************************
+ *                     DASHBOARD PAGE
+ *********************************************************/
+async function initDashboardPage() {
+    guardAuth();
+    bindLogout();
+
+    try {
+        const habits = await apiFetch("/habits/");
+        const logs = await apiFetch("/logs/");
+
+        renderDashboardStats(habits, logs);
+        renderHeatmap(logs);
+        renderRecentLogs(logs, habits);
+        loadProgress();
+        renderWeeklyChart(logs);
+    } catch (err) {
+        alert("Lỗi tải dữ liệu dashboard: " + err.message);
+    }
+}
+
+function renderDashboardStats(habits, logs) {
+    const totalEl = document.getElementById("stat-total-habits");
+    const todayDoneEl = document.getElementById("stat-today-completed");
+    const streakEl = document.getElementById("stat-current-streak");
+
+    if (!totalEl || !todayDoneEl || !streakEl) return;
+
+    totalEl.textContent = habits.length;
+
+    const today = new Date().toISOString().slice(0, 10);
+    todayDoneEl.textContent = logs.filter((l) => l.date?.slice(0, 10) === today).length;
+
+    const logDates = new Set(logs.map((l) => l.date?.slice(0, 10)));
+    let streak = 0;
+    let d = new Date();
+
+    while (true) {
+        const key = d.toISOString().slice(0, 10);
+        if (logDates.has(key)) {
+            streak++;
+            d.setDate(d.getDate() - 1);
+        } else break;
+    }
+
+    streakEl.textContent = `${streak} ngày`;
 }
 
 function renderRecentLogs(logs, habits) {
@@ -230,17 +244,15 @@ function renderRecentLogs(logs, habits) {
     const mapHabit = {};
     habits.forEach((h) => (mapHabit[h.id] = h.name));
 
-    logs.slice(0, 10).forEach((log) => {
-        const row = document.createElement("li");
-        const name = mapHabit[log.habit_id] || "Không rõ";
-        row.innerHTML = `<strong>${name}</strong> — ${new Date(
-            log.date
-        ).toLocaleString("vi-VN")}`;
-        wrap.appendChild(row);
+    logs.slice(0, 10).forEach((l) => {
+        const name = mapHabit[l.habit_id] || "Không rõ";
+        const li = document.createElement("li");
+
+        li.innerHTML = `<strong>${name}</strong> — ${new Date(l.date).toLocaleString("vi-VN")}`;
+        wrap.appendChild(li);
     });
 }
 
-// ======================= PROGRESS ========================
 async function loadProgress() {
     const bar = document.getElementById("progress-bar");
     const text = document.getElementById("progress-text");
@@ -249,14 +261,15 @@ async function loadProgress() {
     if (!bar || !text || !days) return;
 
     const data = await apiFetch("/progress/month");
-    if (!data) return;
 
     bar.style.width = data.percent + "%";
     text.textContent = data.percent + "% hoàn thành";
     days.textContent = `Hoàn thành ${data.completed_days}/${data.total_days} ngày`;
 }
 
-// ======================= HABITS PAGE ======================
+/*********************************************************
+ *                     HABITS PAGE
+ *********************************************************/
 async function initHabitsPage() {
     guardAuth();
     bindLogout();
@@ -287,7 +300,6 @@ async function initHabitsPage() {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         msg.textContent = "";
-        msg.className = "message";
 
         try {
             await apiFetch("/habits/", {
@@ -312,7 +324,7 @@ async function initHabitsPage() {
         const btn = e.target.closest("button");
         if (!btn) return;
 
-        const id = btn.dataset.id;
+        const id = Number(btn.dataset.id);
         const act = btn.dataset.act;
 
         if (act === "delete") {
@@ -324,207 +336,426 @@ async function initHabitsPage() {
             await apiFetch("/logs/", {
                 method: "POST",
                 body: JSON.stringify({
-                    habit_id: Number(id),
+                    habit_id: id,
                     date: new Date().toISOString().slice(0, 10),
                 }),
             });
 
-            alert("Đã đánh dấu hoàn thành!");
+            alert("Đã đánh dấu hoàn thành hôm nay!");
         }
     });
 
     load();
 }
 
-// ======================= LOGS PAGE (CALENDAR) ========================
+/*********************************************************
+ *                     LOGS PAGE (CALENDAR + TICK)
+ *********************************************************/
 async function initLogsPage() {
     guardAuth();
     bindLogout();
 
     const daysContainer = document.getElementById("calendar-days");
     const monthYearEl = document.getElementById("calendar-month-year");
-    const habitsContainer = document.getElementById("selected-habits");
     const weekdayEl = document.getElementById("selected-weekday");
     const dateTextEl = document.getElementById("selected-date-text");
+    const habitsContainer = document.getElementById("selected-habits");
 
     if (!daysContainer || !monthYearEl || !habitsContainer) return;
 
     try {
-        const [habits, logs] = await Promise.all([
-            apiFetch("/habits/"),
-            apiFetch("/logs/"),
-        ]);
+        const habits = await apiFetch("/habits/");
+        const logs = await apiFetch("/logs/");
 
-        // Gom log theo ngày
+        /** Gom log theo ngày */
         const logsByDate = {};
         logs.forEach((l) => {
             const d = l.date?.slice(0, 10);
-            if (!d) return;
             if (!logsByDate[d]) logsByDate[d] = [];
             logsByDate[d].push(l);
         });
 
-        const weekdaysShort = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-        const weekdaysFull = [
-            "Chủ nhật",
-            "Thứ hai",
-            "Thứ ba",
-            "Thứ tư",
-            "Thứ năm",
-            "Thứ sáu",
-            "Thứ bảy",
-        ];
+        const weekdays = ["Chủ nhật","Thứ hai","Thứ ba","Thứ tư","Thứ năm","Thứ sáu","Thứ bảy"];
         const monthNames = [
-            "Tháng 1",
-            "Tháng 2",
-            "Tháng 3",
-            "Tháng 4",
-            "Tháng 5",
-            "Tháng 6",
-            "Tháng 7",
-            "Tháng 8",
-            "Tháng 9",
-            "Tháng 10",
-            "Tháng 11",
-            "Tháng 12",
+            "Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6",
+            "Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"
         ];
 
-        let current = new Date(); // tháng đang xem
+        let current = new Date();
         let selectedDate = new Date().toISOString().slice(0, 10);
 
+        /** HEADER */
         function renderSelectedHeader() {
-            if (!weekdayEl || !dateTextEl) return;
             const d = new Date(selectedDate + "T00:00:00");
-            weekdayEl.textContent = weekdaysFull[d.getDay()] || "";
+            weekdayEl.textContent = weekdays[d.getDay()];
 
-            const day = d.getDate().toString().padStart(2, "0");
-            const month = (d.getMonth() + 1).toString().padStart(2, "0");
-            const year = d.getFullYear();
-            dateTextEl.textContent = `${day}/${month}/${year}`;
+            dateTextEl.textContent =
+                `${d.getDate().toString().padStart(2,"0")}/${
+                    (d.getMonth()+1).toString().padStart(2,"0")
+                }/${d.getFullYear()}`;
         }
 
+        /** HABIT LIST */
         function renderHabitsForSelected() {
             habitsContainer.innerHTML = "";
 
-            const dayLogs = logsByDate[selectedDate] || [];
-            const doneIds = new Set(dayLogs.map((l) => l.habit_id));
+            const list = logsByDate[selectedDate] || [];
+            const logMap = {};
+            list.forEach((l) => (logMap[l.habit_id] = l));
 
             habits.forEach((h) => {
-                const done = doneIds.has(h.id);
+                const log = logMap[h.id];
+                const done = !!log;
+
+                const icon = h.name.split(" ")[0];
+                const plain = h.name.replace(/^\S+\s/, "");
+
                 const card = document.createElement("div");
-                card.className =
-                    "habit-card" + (done ? " habit-card-done" : "");
+                card.className = "habit-card" + (done ? " habit-card-done" : "");
 
                 card.innerHTML = `
-                    <div class="habit-icon">${done ? "✓" : ""}</div>
-                    <div class="habit-info">
-                        <div class="habit-name">${h.name}</div>
-                        <div class="habit-status">${
-                            done ? "Đã hoàn thành" : "Chưa làm"
-                        }</div>
+                    <div class="habit-left" style="display:flex;align-items:center;gap:12px;">
+                        <div class="habit-icon">${icon}</div>
+
+                        <div class="habit-info">
+                            <div class="habit-name">${plain}</div>
+                            <div class="habit-status">${done ? "Đã hoàn thành" : "Chưa làm"}</div>
+                        </div>
                     </div>
+
+                    <button class="habit-toggle ${done ? "done" : ""}"
+                        data-habit-id="${h.id}"
+                        data-log-id="${done ? log.id : ""}">
+                        <div class="toggle-circle"><span class="toggle-check">✓</span></div>
+                        ${done ? "Đã xong" : "Đánh dấu xong"}
+                    </button>
                 `;
+
                 habitsContainer.appendChild(card);
+            });
+
+            bindToggleEvents();
+        }
+
+        /** TICK EVENT */
+        function bindToggleEvents() {
+            document.querySelectorAll(".habit-toggle").forEach((btn) => {
+                btn.onclick = async () => {
+                    const habitId = Number(btn.dataset.habitId);
+                    const logId = btn.dataset.logId;
+
+                    try {
+                        if (logId) {
+                            await apiFetch(`/logs/${logId}`, { method: "DELETE" });
+                            logsByDate[selectedDate] = logsByDate[selectedDate].filter(
+                                (l) => l.id !== Number(logId)
+                            );
+                        } else {
+                            const created = await apiFetch("/logs/", {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    habit_id: habitId,
+                                    date: selectedDate,
+                                }),
+                            });
+
+                            logsByDate[selectedDate] = logsByDate[selectedDate] || [];
+                            logsByDate[selectedDate].push(created);
+                        }
+
+                        renderCalendar();
+                        renderSelectedHeader();
+                        renderHabitsForSelected();
+                    } catch (err) {
+                        alert("Không cập nhật được: " + err.message);
+                    }
+                };
             });
         }
 
+        /** CALENDAR */
         function renderCalendar() {
             daysContainer.innerHTML = "";
 
-            const display = new Date(
-                current.getFullYear(),
-                current.getMonth(),
-                1
-            );
-            const firstDayIndex = display.getDay(); // 0 = CN
-            const daysInMonth = new Date(
-                display.getFullYear(),
-                display.getMonth() + 1,
-                0
-            ).getDate();
+            const display = new Date(current.getFullYear(), current.getMonth(), 1);
+            const firstDay = display.getDay();
+            const total = new Date(display.getFullYear(), display.getMonth() + 1, 0).getDate();
 
-            monthYearEl.textContent = `${monthNames[display.getMonth()]} ${
-                display.getFullYear()
-            }`;
+            monthYearEl.textContent = `${monthNames[display.getMonth()]} ${display.getFullYear()}`;
 
-            // Hàng thứ trong tuần (CN–T7)
-            weekdaysShort.forEach((w) => {
+            ["CN","T2","T3","T4","T5","T6","T7"].forEach((w) => {
                 const el = document.createElement("div");
                 el.className = "cal-weekday";
                 el.textContent = w;
                 daysContainer.appendChild(el);
             });
 
-            // Ô trống trước ngày 1
-            for (let i = 0; i < firstDayIndex; i++) {
-                const empty = document.createElement("div");
-                empty.className = "cal-day empty";
-                daysContainer.appendChild(empty);
+            for (let i = 0; i < firstDay; i++) {
+                const e = document.createElement("div");
+                e.className = "cal-day empty";
+                daysContainer.appendChild(e);
             }
 
-            const todayStr = new Date().toISOString().slice(0, 10);
+            const todayStr = new Date().toISOString().slice(0,10);
 
-            // Các ngày trong tháng
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateObj = new Date(
-                    display.getFullYear(),
-                    display.getMonth(),
-                    day
-                );
-                const dateStr = dateObj.toISOString().slice(0, 10);
+            for (let d = 1; d <= total; d++) {
+                const dateObj = new Date(display.getFullYear(), display.getMonth(), d);
+                const dateStr = dateObj.toISOString().slice(0,10);
 
-                const cell = document.createElement("div");
                 let classes = "cal-day";
-
                 if (dateStr === todayStr) classes += " today";
                 if (dateStr === selectedDate) classes += " selected";
                 if (logsByDate[dateStr]?.length) classes += " has-log";
 
+                const cell = document.createElement("div");
                 cell.className = classes;
                 cell.dataset.date = dateStr;
-                cell.textContent = day.toString();
+                cell.textContent = d;
 
                 daysContainer.appendChild(cell);
             }
         }
 
-        // Nút chuyển tháng
-        const btnPrev = document.getElementById("cal-prev");
-        const btnNext = document.getElementById("cal-next");
+        /** EVENTS */
+        document.getElementById("cal-prev").onclick = () => {
+            current.setMonth(current.getMonth() - 1);
+            renderCalendar();
+        };
 
-        if (btnPrev) {
-            btnPrev.addEventListener("click", () => {
-                current.setMonth(current.getMonth() - 1);
-                renderCalendar();
-            });
-        }
+        document.getElementById("cal-next").onclick = () => {
+            current.setMonth(current.getMonth() + 1);
+            renderCalendar();
+        };
 
-        if (btnNext) {
-            btnNext.addEventListener("click", () => {
-                current.setMonth(current.getMonth() + 1);
-                renderCalendar();
-            });
-        }
-
-        // Click chọn ngày
-        daysContainer.addEventListener("click", (e) => {
+        daysContainer.onclick = (e) => {
             const cell = e.target.closest(".cal-day");
             if (!cell || cell.classList.contains("empty")) return;
 
-            const dateStr = cell.dataset.date;
-            if (!dateStr) return;
-
-            selectedDate = dateStr;
+            selectedDate = cell.dataset.date;
             renderCalendar();
             renderSelectedHeader();
             renderHabitsForSelected();
-        });
+        };
 
-        // Lần render đầu tiên
+        /** POPUP CREATE HABIT */
+        const popup = document.getElementById("create-popup");
+        const btnOpenCreate = document.getElementById("btn-open-create");
+        const btnClosePopup = document.getElementById("popup-close");
+
+        const iconChoices = document.getElementById("icon-choices");
+        const iconHidden = document.getElementById("habit-icon");
+
+        const timePopup = document.getElementById("timepicker");
+        const btnOpenTime = document.getElementById("open-timepicker");
+        const btnTimeCancel = document.getElementById("time-cancel");
+        const btnTimeOk = document.getElementById("time-ok");
+        const timeInput = document.getElementById("time-input");
+        const selectedTimeEl = document.getElementById("selected-time");
+
+        btnOpenCreate.onclick = () => popup.classList.remove("hidden");
+        btnClosePopup.onclick = () => popup.classList.add("hidden");
+
+        btnOpenTime.onclick = () => timePopup.classList.remove("hidden");
+        btnTimeCancel.onclick = () => timePopup.classList.add("hidden");
+        btnTimeOk.onclick = () => {
+            selectedTimeEl.textContent = timeInput.value;
+            timePopup.classList.add("hidden");
+        };
+
+        if (iconChoices) {
+            iconChoices.onclick = (e) => {
+                const btn = e.target.closest(".icon-pill");
+                if (!btn) return;
+
+                iconChoices.querySelectorAll(".icon-pill").forEach((b) => b.classList.remove("selected"));
+                btn.classList.add("selected");
+
+                iconHidden.value = btn.dataset.icon;
+            };
+        }
+
+        document.getElementById("popup-save").onclick = async () => {
+            const nameInput = document.getElementById("habit-name");
+            const noteInput = document.getElementById("habit-note");
+
+            const baseName = nameInput.value.trim();
+            const icon = iconHidden.value;
+
+            if (!baseName) {
+                alert("Vui lòng nhập tên thói quen");
+                return;
+            }
+
+            const finalName = icon ? `${icon} ${baseName}` : baseName;
+
+            try {
+                await apiFetch("/habits/", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        name: finalName,
+                        description: noteInput.value || "",
+                    }),
+                });
+
+                popup.classList.add("hidden");
+
+                const newHabits = await apiFetch("/habits/");
+                habits.splice(0, habits.length, ...newHabits);
+
+                renderHabitsForSelected();
+            } catch (err) {
+                alert("Không tạo được thói quen: " + err.message);
+            }
+        };
+
+        /** INITIAL RENDER */
         renderCalendar();
         renderSelectedHeader();
         renderHabitsForSelected();
+
     } catch (err) {
         alert("Không tải được nhật ký: " + err.message);
     }
+}
+function renderWeeklyChart(logs) {
+    const ctx = document.getElementById("weeklyChart");
+    if (!ctx) return;
+
+    // --- Lấy ngày hôm nay ---
+    const today = new Date();
+
+    // Tạo mảng 4 tuần gần nhất (tuần 0 = tuần hiện tại)
+    let weekRanges = [];
+    for (let i = 0; i < 4; i++) {
+        let start = new Date(today);
+        start.setDate(today.getDate() - today.getDay() - i * 7); // đầu tuần
+
+        let end = new Date(start);
+        end.setDate(start.getDate() + 6);
+
+        weekRanges.push({ start, end });
+    }
+
+    // --- Đếm số log mỗi tuần ---
+    let weeklyCounts = weekRanges.map((range) => {
+        return logs.filter((l) => {
+            let d = new Date(l.date);
+            return d >= range.start && d <= range.end;
+        }).length;
+    });
+
+    // --- Tính % hoàn thành mỗi tuần ---
+    let percent = weeklyCounts.map((c) => {
+        const totalPossible = 7; // mỗi tuần 7 ngày
+        return Math.round((c / totalPossible) * 100);
+    });
+
+    // --- Label tuần đẹp mắt ---
+    const labels = weekRanges.map((r, idx) => {
+        const d = r.start.getDate().toString().padStart(2, "0");
+        const m = (r.start.getMonth() + 1).toString().padStart(2, "0");
+        return `Tuần ${4 - idx}\n(${d}/${m})`;
+    });
+
+    // --- Xóa chart cũ để tránh lỗi ---
+    if (window.weekChart) window.weekChart.destroy();
+
+    // --- Vẽ biểu đồ ---
+    window.weekChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels.reverse(),       // tuần 1 → tuần 4
+            datasets: [
+                {
+                    label: "Tỷ lệ hoàn thành (%)",
+                    data: percent.reverse(), // tuần 1 → tuần 4
+                    backgroundColor: "rgba(54, 162, 235, 0.8)",
+                    borderRadius: 6,
+                    borderSkipped: false,
+                },
+            ],
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: (v) => v + "%",
+                    },
+                },
+            },
+        },
+    });
+}
+/******************************************************
+ *         BIỂU ĐỒ CỘT — HOÀN THÀNH THEO TUẦN
+ ******************************************************/
+function renderWeeklyChart(logs) {
+    const canvas = document.getElementById("weeklyChart");
+    if (!canvas) return; // nếu không có canvas thì bỏ qua
+
+    const ctx = canvas.getContext("2d");
+
+    // Gom log theo ngày
+    const countByDate = {};
+    logs.forEach(l => {
+        const d = l.date?.slice(0, 10);
+        countByDate[d] = (countByDate[d] || 0) + 1;
+    });
+
+    // Tính 4 tuần gần nhất
+    const labels = ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"];
+    const values = [];
+    const today = new Date();
+
+    for (let i = 3; i >= 0; i--) {
+        let completed = 0;
+        let total = 0;
+
+        for (let d = 0; d < 7; d++) {
+            const dateObj = new Date(today);
+            dateObj.setDate(today.getDate() - (i * 7 + d));
+
+            const key = dateObj.toISOString().slice(0, 10);
+
+            total += 1; // mỗi ngày ít nhất 1 habit → dùng để tính % đơn giản
+            if (countByDate[key]) completed++;
+        }
+
+        const percent = Math.round((completed / total) * 100);
+        values.push(percent);
+    }
+
+    // Nếu đã có chart → xóa trước
+    if (window.weekChart) window.weekChart.destroy();
+
+    // Vẽ mới
+    window.weekChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: "% hoàn thành",
+                    data: values,
+                    backgroundColor: "rgba(54,162,235,0.85)",
+                    borderRadius: 8,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { callback: v => v + "%" }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
 }

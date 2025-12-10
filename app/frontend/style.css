@@ -181,3 +181,260 @@ input, textarea {
 }
 .message.error { color: red; }
 .message.success { color: green; }
+/* =========================================================
+   LOGS PAGE LAYOUT
+========================================================= */
+
+.logs-layout {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.logs-left {
+    width: 65%;
+}
+.logs-right {
+    width: 30%;
+}
+
+.day-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #3b4cd9;
+}
+.day-subtitle {
+    color: #777;
+    margin-bottom: 20px;
+}
+
+/* =========================================================
+   HABIT CARD – với icon + tick hoàn thành
+========================================================= */
+
+.habit-card {
+    background: #ffffff;
+    padding: 16px 20px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 8px 30px rgba(15,23,42,0.08);
+}
+
+.habit-card-done {
+    border-left: 5px solid #22c55e;
+}
+
+.habit-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.habit-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    background: #dcfce7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.habit-info {
+    display: flex;
+    flex-direction: column;
+}
+.habit-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+}
+.habit-status {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Tick button */
+.habit-toggle {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.toggle-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    border: 2px solid #d4d4d4;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+}
+
+.toggle-check {
+    font-size: 16px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.18s ease;
+    color: white;
+}
+
+.habit-toggle.done .toggle-circle {
+    background: #22c55e;
+    border-color: #16a34a;
+    box-shadow: 0 0 0 4px rgba(34,197,94,0.25);
+}
+.habit-toggle.done .toggle-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* =========================================================
+   CALENDAR
+========================================================= */
+.calendar-card {
+    background: white;
+    padding: 15px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+    color: #3b4cd9;
+    margin-bottom: 10px;
+}
+
+.cal-nav-btn {
+    background: #d8dffe;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 8px;
+    text-align: center;
+}
+
+.cal-weekday {
+    font-weight: bold;
+    color: #3b4cd9;
+}
+
+.cal-day {
+    padding: 8px 0;
+    background: #f6f7ff;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.cal-day.today {
+    border: 2px solid #36c56a;
+}
+.cal-day.selected {
+    background: #cdd6ff;
+    font-weight: bold;
+}
+.cal-day.has-log {
+    background: #b7ffd4 !important;
+}
+.empty {
+    background: transparent !important;
+    cursor: default;
+}
+
+/* =========================================================
+   POPUP TẠO THÓI QUEN + ICON
+========================================================= */
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.popup-content {
+    background: white;
+    width: 360px;
+    max-width: 95%;
+    padding: 22px 20px;
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(15,23,42,0.35);
+}
+
+.popup-content input,
+.popup-content select,
+.popup-content textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+.icon-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.icon-pill {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: none;
+    background: #eef2ff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.icon-pill span {
+    font-size: 18px;
+}
+.icon-pill.selected {
+    background: #2563eb;
+    color: white;
+}
+
+/* TIME PICKER */
+.timepicker-box input[type="time"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+}
+#weeklyChart {
+    margin-top: 15px;
+}
+
+.card h3 {
+    margin-bottom: 12px;
+    font-size: 20px;
+}

@@ -8,7 +8,6 @@
 
 <body data-page="dashboard">
 
-<!-- ================= NAVBAR ================== -->
 <header class="topbar">
     <div class="logo">Habit Tracker</div>
 
@@ -18,7 +17,6 @@
         <button id="logout-btn" class="btn small logout">Đăng xuất</button>
     </nav>
 </header>
-<!-- =========================================== -->
 
 <main class="page">
 
@@ -40,13 +38,11 @@
     </section>
 
     <section class="two-column">
-        <!-- Heatmap -->
         <div class="card">
             <h2>Heatmap 30 ngày gần nhất</h2>
             <div id="heatmap" class="heatmap"></div>
         </div>
 
-        <!-- Recent logs -->
         <div class="card">
             <h2>Hoạt động gần đây</h2>
             <ul id="recent-logs" class="activity-list"></ul>
@@ -61,6 +57,15 @@
         <p id="progress-text" class="progress-text"></p>
         <p id="progress-days" class="progress-days"></p>
     </section>
+
+    <!-- 🔥 BIỂU ĐỒ CỘT TUẦN (A1) -->
+    <section class="card">
+        <h2>Tỷ lệ hoàn thành mỗi tuần</h2>
+        <canvas id="weeklyChart" height="120"></canvas>
+    </section>
+
+    <!-- Thư viện biểu đồ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </main>
 
