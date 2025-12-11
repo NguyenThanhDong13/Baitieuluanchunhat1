@@ -186,11 +186,29 @@ function renderHeatmap(logs) {
         container.appendChild(el);
     }
 }
+/*********************************************************
+ *         CÂU NÓI TẠO ĐỘNG LỰC (CHỈ THÊM – KHÔNG SỬA)
+ *********************************************************/
+const MOTIVATIONAL_QUOTES = [
+    "Thành công là tổng của những nỗ lực nhỏ lặp lại mỗi ngày.",
+    "Không cần nhanh, chỉ cần đều đặn.",
+    "Kỷ luật là cầu nối giữa mục tiêu và thành tựu.",
+    "Hôm nay bạn chỉ cần tốt hơn hôm qua 1%.",
+    "10 phút mỗi ngày cũng đủ để thay đổi cuộc đời.",
+    "Thói quen tốt tạo nên cuộc sống tốt.",
+    "Bắt đầu nhỏ – Kiên trì lớn."
+];
+
+function getDailyQuote() {
+    const day = new Date().getDate();
+    return MOTIVATIONAL_QUOTES[day % MOTIVATIONAL_QUOTES.length];
+}
 
 /*********************************************************
  *                     DASHBOARD PAGE
  *********************************************************/
 async function initDashboardPage() {
+
     guardAuth();
     bindLogout();
 
@@ -203,6 +221,10 @@ async function initDashboardPage() {
         renderRecentLogs(logs, habits);
         loadProgress();
         renderWeeklyChart(logs);
+
+        // Hiển thị câu nói tạo động lực
+    const q = document.getElementById("quote-text");
+    if (q) q.textContent = getDailyQuote();
     } catch (err) {
         alert("Lỗi tải dữ liệu dashboard: " + err.message);
     }
