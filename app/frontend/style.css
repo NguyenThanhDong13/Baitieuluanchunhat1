@@ -438,3 +438,41 @@ input, textarea {
     margin-bottom: 12px;
     font-size: 20px;
 }
+.habit-delete-btn {
+    background: #fee2e2;
+    border: none;
+    color: #dc2626;
+    font-size: 18px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.habit-delete-btn:hover {
+    background: #fecaca;
+}
+
+.habit-delete-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    background: #ffe5e5;
+    border-radius: 50%;
+    font-size: 20px;
+    color: #ff3b3b;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.habit-delete-btn:hover {
+    background: #ffcccc;
+    transform: scale(1.05);
+}

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models.habit import Habit
+from app.models.habit_log import HabitLog
 from app.schemas.habit import HabitCreate, HabitOut
 from app.core.security import get_current_user
 from app.models.user import User
@@ -45,6 +46,7 @@ def delete_habit(
     user: User = Depends(get_current_user)
 ):
 
+    # Lấy habit
     habit = (
         db.query(Habit)
         .filter(Habit.id == habit_id, Habit.user_id == user.id)
@@ -54,6 +56,10 @@ def delete_habit(
     if not habit:
         raise HTTPException(status_code=404, detail="Không tìm thấy thói quen")
 
+    # 🔥 Xoá toàn bộ log liên quan trước (tránh lỗi FOREIGN KEY)
+    db.query(HabitLog).filter(HabitLog.habit_id == habit_id).delete()
+
+    # 🔥 Sau đó xoá habit
     db.delete(habit)
     db.commit()
 

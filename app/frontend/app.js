@@ -418,46 +418,91 @@ async function initLogsPage() {
         }
 
         /** HABIT LIST */
-        function renderHabitsForSelected() {
-            habitsContainer.innerHTML = "";
+function renderHabitsForSelected() {
+    habitsContainer.innerHTML = "";
 
-            const list = logsByDate[selectedDate] || [];
-            const logMap = {};
-            list.forEach((l) => (logMap[l.habit_id] = l));
+    const list = logsByDate[selectedDate] || [];
+    const logMap = {};
+    list.forEach((l) => (logMap[l.habit_id] = l));
 
-            habits.forEach((h) => {
-                const log = logMap[h.id];
-                const done = !!log;
+    habits.forEach((h) => {
+        const log = logMap[h.id];
+        const done = !!log;
 
-                const icon = h.name.split(" ")[0];
-                const plain = h.name.replace(/^\S+\s/, "");
+        const icon = h.name.split(" ")[0];
+        const plain = h.name.replace(/^\S+\s/, "");
 
-                const card = document.createElement("div");
-                card.className = "habit-card" + (done ? " habit-card-done" : "");
+        const card = document.createElement("div");
+        card.className = "habit-card" + (done ? " habit-card-done" : "");
 
-                card.innerHTML = `
-                    <div class="habit-left" style="display:flex;align-items:center;gap:12px;">
-                        <div class="habit-icon">${icon}</div>
+        card.innerHTML = `
+            <div class="habit-left" style="display:flex;align-items:center;gap:12px;">
+                <div class="habit-icon">${icon}</div>
 
-                        <div class="habit-info">
-                            <div class="habit-name">${plain}</div>
-                            <div class="habit-status">${done ? "Đã hoàn thành" : "Chưa làm"}</div>
-                        </div>
+                <div class="habit-info">
+                    <div class="habit-name">${plain}</div>
+                    <div class="habit-status">${done ? "Đã hoàn thành" : "Chưa làm"}</div>
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:14px;">
+
+                <button class="habit-delete-btn"
+                        data-id="${h.id}"
+                        style="background:#ffe1e1;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:20px;">
+                    ❌
+                </button>
+
+                <button class="habit-toggle ${done ? "done" : ""}"
+                    data-habit-id="${h.id}"
+                    data-log-id="${done ? log.id : ""}">
+                    <div class="toggle-circle">
+                        <span class="toggle-check">✓</span>
                     </div>
+                    ${done ? "Đã xong" : "Đánh dấu xong"}
+                </button>
+            </div>
+        `;
 
-                    <button class="habit-toggle ${done ? "done" : ""}"
-                        data-habit-id="${h.id}"
-                        data-log-id="${done ? log.id : ""}">
-                        <div class="toggle-circle"><span class="toggle-check">✓</span></div>
-                        ${done ? "Đã xong" : "Đánh dấu xong"}
-                    </button>
-                `;
+        habitsContainer.appendChild(card);
+    });
 
-                habitsContainer.appendChild(card);
-            });
+    // ========================= XOÁ HABIT =========================
+    document.querySelectorAll(".habit-delete-btn").forEach((btn) => {
+        btn.onclick = async () => {
+            const id = btn.dataset.id;
 
-            bindToggleEvents();
-        }
+            if (!confirm("Bạn có chắc muốn xoá thói quen này?")) return;
+
+            try {
+                await apiFetch(`/habits/${id}`, { method: "DELETE" });
+
+                const newHabits = await apiFetch("/habits/");
+                habits.splice(0, habits.length, ...newHabits);
+
+                const newLogs = await apiFetch("/logs/");
+                logsByDate = {};
+                newLogs.forEach((l) => {
+                    const d = l.date.slice(0, 10);
+                    (logsByDate[d] ||= []).push(l);
+                });
+
+                renderCalendar();
+                renderSelectedHeader();
+                renderHabitsForSelected();
+                renderHeatmap(newLogs);
+
+            } catch (err) {
+                alert("Không xóa được: " + err.message);
+            }
+        };
+    });
+
+    // ========================= TICK HOÀN THÀNH ==================
+    bindToggleEvents();
+}
+
+
 
         /** TICK EVENT */
         function bindToggleEvents() {

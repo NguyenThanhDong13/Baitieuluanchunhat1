@@ -1,0 +1,24 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments
+.venv/
+env/
+venv/
+
+# Database files
+*.db
+*.sqlite3
+
+# VSCode settings
+.vscode/
+
+# FastAPI static build
+/static/
+
+# OS generated files
+.DS_Store
+Thumbs.db
