@@ -680,6 +680,33 @@ function renderHabitsForSelected() {
         renderSelectedHeader();
         renderHabitsForSelected();
 
+        /*******************************************************
+ *        NOTIFICATION REMINDER (MỖI 5 PHÚT)
+ *******************************************************/
+requestNotificationPermission().then((granted) => {
+
+    if (!granted) return;
+
+    setInterval(() => {
+
+        const today = new Date().toISOString().slice(0, 10);
+
+        const logsToday = logsByDate[today] || [];
+        const doneIds = logsToday.map(l => l.habit_id);
+
+        const todo = habits.filter(h => !doneIds.includes(h.id));
+
+        if (todo.length > 0) {
+            sendNotification(
+                "Nhắc nhở Habit Tracker",
+                `Bạn còn ${todo.length} thói quen chưa hoàn thành hôm nay!`
+            );
+        }
+
+    }, 1 * 60 * 1000); // 1 phút
+});
+
+
     } catch (err) {
         alert("Không tải được nhật ký: " + err.message);
     }
@@ -825,4 +852,24 @@ function renderWeeklyChart(logs) {
             }
         }
     });
+}
+/*********************************************************
+ *                     NOTIFICATION SETUP
+ *********************************************************/
+async function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+        console.log("Trình duyệt không hỗ trợ Notification");
+        return false;
+    }
+
+    if (Notification.permission === "granted") return true;
+
+    const permission = await Notification.requestPermission();
+    return permission === "granted";
+}
+
+function sendNotification(title, body) {
+    if (Notification.permission === "granted") {
+        new Notification(title, { body: body });
+    }
 }
