@@ -909,7 +909,7 @@ function setupSocialSharing() {
         // ✅ Fallback: copy text
         else {
             await navigator.clipboard.writeText(text);
-            if (msg) msg.textContent = "Đã sao chép nội dung để chia sẻ!";
+            if (msg) msg.textContent = "Đã sao chép nội dung để chia sẻ!!";
         }
     };
 }
