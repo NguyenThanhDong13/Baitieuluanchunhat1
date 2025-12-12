@@ -222,6 +222,8 @@ async function initDashboardPage() {
         loadProgress();
         renderWeeklyChart(logs);
 
+        setupSocialSharing();
+
         // Hiển thị câu nói tạo động lực
     const q = document.getElementById("quote-text");
     if (q) q.textContent = getDailyQuote();
@@ -674,12 +676,12 @@ function renderHabitsForSelected() {
                 alert("Không tạo được thói quen: " + err.message);
             }
         };
-
+     
         /** INITIAL RENDER */
         renderCalendar();
         renderSelectedHeader();
         renderHabitsForSelected();
-
+        
         /*******************************************************
  *        NOTIFICATION REMINDER (MỖI 5 PHÚT)
  *******************************************************/
@@ -872,4 +874,42 @@ function sendNotification(title, body) {
     if (Notification.permission === "granted") {
         new Notification(title, { body: body });
     }
+}
+/*********************************************************
+ *                 SOCIAL SHARING
+ *********************************************************/
+function setupSocialSharing() {
+    const btn = document.getElementById("share-btn");
+    const msg = document.getElementById("share-msg");
+
+    if (!btn) return;
+
+    btn.onclick = async () => {
+        const streakEl = document.getElementById("stat-current-streak");
+        const totalEl = document.getElementById("stat-total-habits");
+
+        const streak = streakEl ? streakEl.textContent : "0 ngày";
+        const total = totalEl ? totalEl.textContent : "0";
+
+        const text = `🔥 Tôi đang duy trì streak ${streak} với ${total} thói quen mỗi ngày!
+#HabitTracker`;
+
+        // ✅ Web Share API
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: "Habit Tracker",
+                    text: text,
+                });
+                if (msg) msg.textContent = "Đã chia sẻ thành công!";
+            } catch (err) {
+                console.log("Huỷ chia sẻ");
+            }
+        } 
+        // ✅ Fallback: copy text
+        else {
+            await navigator.clipboard.writeText(text);
+            if (msg) msg.textContent = "Đã sao chép nội dung để chia sẻ!";
+        }
+    };
 }
