@@ -33,3 +33,12 @@ chức năng chính
 - /progress/month
 
 Xác thực sử dụng JWT Bearer Token gửi kèm trong header:
+
+##  Hướng dẫn chạy local
+
+###  Backend
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
