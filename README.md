@@ -22,7 +22,7 @@ chức năng chính
 + Suwrr dụng Web Notifications API
 + Tự động nhắc khi thói quen chưa hoàn thành trong ngày
 - Social Sharing
-+ Chia sẽ steak và thành tích qua
++ Chia sẻ steak và thành tích qua
 
   Kết nối backend với frontend
   Frontend giao tiếp với backend thông qua REST API:
