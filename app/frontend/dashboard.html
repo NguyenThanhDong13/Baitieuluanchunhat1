@@ -1,84 +1,112 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <title>Habit Tracker – Thống kê</title>
-    <link rel="stylesheet" href="/static/style.css" />
+  <meta charset="UTF-8" />
+  <title>Habit Tracker – Thống kê</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/style.css" />
+
+  <!-- ChartJS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body data-page="dashboard">
 
+<!-- ===== TOP BAR ===== -->
 <header class="topbar">
-    <div class="logo">Habit Tracker</div>
+  <div class="logo">Habit Tracker</div>
 
-    <nav class="nav">
-        <a href="/logs" class="nav-item">Nhật ký</a>
-        <a href="/dashboard" class="nav-item active">Thống kê</a>
-        <button id="logout-btn" class="btn small logout">Đăng xuất</button>
-    </nav>
+  <nav class="nav">
+    <a href="/logs" class="nav-item">Nhật ký</a>
+    <a href="/dashboard" class="nav-item active">Thống kê</a>
+    <button id="logout-btn" class="btn secondary small">Đăng xuất</button>
+  </nav>
 </header>
 
-<main class="page">
+<!-- ===== MAIN ===== -->
+<main class="page dashboard">
 
-    <!-- ⭐ CÂU NÓI TẠO ĐỘNG LỰC (đã thêm) -->
-    <section class="card">
-        <h2>Câu nói tạo động lực hôm nay</h2>
-        <p id="quote-text" style="font-size: 18px; color:#374151; line-height:1.4;"></p>
-    </section>
+  <!-- ===== QUOTE ===== -->
+  <section class="card">
+    <h2>Câu nói tạo động lực hôm nay</h2>
+    <p id="quote-text" class="quote-text"></p>
+  </section>
 
-    <section class="stats-grid">
-        <div class="stat-card">
-            <h3>Tổng số thói quen</h3>
-            <p id="stat-total-habits" class="stat-value">0</p>
-        </div>
+  <!-- ===== STATS (ĐÃ BỌC CARD → HẾT SÁT) ===== -->
+  <section class="card">
+    <div class="stats-grid old-stats">
+      <div class="stat-card">
+        <h3>Tổng số thói quen</h3>
+        <p id="stat-total-habits" class="stat-value">0</p>
+      </div>
 
-        <div class="stat-card">
-            <h3>Hoàn thành hôm nay</h3>
-            <p id="stat-today-completed" class="stat-value">0</p>
-        </div>
+      <div class="stat-card">
+        <h3>Hoàn thành hôm nay</h3>
+        <p id="stat-today-completed" class="stat-value">0</p>
+      </div>
 
-        <div class="stat-card">
-            <h3>Streak hiện tại</h3>
-            <p id="stat-current-streak" class="stat-value">0 ngày</p>
-        </div>
-    </section>
+      <div class="stat-card">
+        <h3>Streak hiện tại</h3>
+        <p id="stat-current-streak" class="stat-value">0 ngày</p>
+      </div>
+    </div>
+  </section>
 
-    <section class="two-column">
-        <div class="card">
-            <h2>Heatmap 30 ngày gần nhất</h2>
-            <div id="heatmap" class="heatmap"></div>
-        </div>
+  <!-- ===== THEO DÕI ===== -->
+  <section class="grid-2">
 
-        <div class="card">
-            <h2>Hoạt động gần đây</h2>
-            <ul id="recent-logs" class="activity-list"></ul>
-        </div>
-    </section>
+    <div class="card">
+      <h3>Heatmap 30 ngày gần nhất</h3>
+      <div id="heatmap" class="heatmap"></div>
+    </div>
 
-    <section class="card">
-        <h2>Tiến độ tháng</h2>
+    <div class="card">
+      <h3>Hoạt động gần đây</h3>
+      <ul id="recent-logs" class="activity-list"></ul>
+    </div>
+
+  </section>
+
+  <!-- ===== PHÂN TÍCH ===== -->
+  <section class="grid-2">
+
+    <div class="card">
+      <h3>Tiến độ tháng</h3>
+
+      <div class="progress-row">
         <div class="progress-bar">
-            <div id="progress-bar" class="progress"></div>
+          <div id="progress-bar" class="progress"></div>
         </div>
-        <p id="progress-text" class="progress-text"></p>
-        <p id="progress-days" class="progress-days"></p>
-    </section>
+        <div id="progress-text" class="progress-pill">0%</div>
+      </div>
 
-    <section class="card">
-        <h2>Tỷ lệ hoàn thành mỗi tuần</h2>
-        <canvas id="weeklyChart" height="120"></canvas>
-    </section>
+      <p id="progress-days" class="progress-days"></p>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</main>
-<section class="card">
-    <h2>Chia sẻ thành tích</h2>
-    <button id="share-btn" class="btn primary">
+    <div class="card">
+      <h3>Tỷ lệ hoàn thành mỗi tuần</h3>
+      <canvas id="weeklyChart" height="140"></canvas>
+    </div>
+
+  </section>
+
+  <!-- ===== SHARE ===== -->
+  <section class="card share-card">
+    <h3>Chia sẻ thành tích</h3>
+
+    <div class="share-row">
+      <button id="share-btn" class="btn primary">
         📤 Chia sẻ streak của tôi
-    </button>
-    <p id="share-msg" style="margin-top:10px;color:green;"></p>
-</section>
+      </button>
+      <p id="share-msg" class="share-msg"></p>
+    </div>
+  </section>
 
+</main>
+
+<!-- ===== JS ===== -->
 <script src="/static/app.js"></script>
+
 </body>
 </html>

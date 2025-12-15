@@ -278,18 +278,33 @@ function renderRecentLogs(logs, habits) {
 }
 
 async function loadProgress() {
-    const bar = document.getElementById("progress-bar");
-    const text = document.getElementById("progress-text");
-    const days = document.getElementById("progress-days");
+  const bar = document.getElementById("progress-bar");
+  const text = document.getElementById("progress-text");
+  const days = document.getElementById("progress-days");
 
-    if (!bar || !text || !days) return;
+  if (!bar || !text || !days) return;
 
-    const data = await apiFetch("/progress/month");
+  const data = await apiFetch("/progress/month");
 
-    bar.style.width = data.percent + "%";
-    text.textContent = data.percent + "% hoàn thành";
-    days.textContent = `Hoàn thành ${data.completed_days}/${data.total_days} ngày`;
+  const completed = Number(data.completed_days ?? 0);
+  const total = Number(data.total_days ?? 1);
+
+  const percent = Math.round((completed / total) * 100);
+
+  // reset về 0 trước
+  bar.style.width = "0%";
+  text.textContent = "0%";
+
+  // animate sau 100ms
+  setTimeout(() => {
+    bar.style.width = percent + "%";
+    text.textContent = percent + "%";
+  }, 100);
+
+  days.textContent = `Hoàn thành ${completed}/${total} ngày`;
 }
+
+
 
 /*********************************************************
  *                     HABITS PAGE
@@ -913,3 +928,10 @@ function setupSocialSharing() {
         }
     };
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const page = document.body.dataset.page;
+
+  if (page === "dashboard") {
+    loadProgress();
+  }
+});
